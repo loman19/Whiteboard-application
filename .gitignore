@@ -1,0 +1,57 @@
+# ===================== #
+# Node dependencies     #
+# ===================== #
+backend/node_modules/
+frontend/node_modules/
+bonus/node_modules/
+
+# ===================== #
+# Environment files     #
+# ===================== #
+**/.env
+**/.env.local
+**/.env.development
+**/.env.production
+
+# ===================== #
+# Logs & debug          #
+# ===================== #
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ===================== #
+# Prisma generated files#
+# ===================== #
+backend/prisma/.cache/
+backend/src/generated/
+
+# ===================== #
+# Build outputs         #
+# ===================== #
+**/dist/
+**/build/
+**/.next/
+**/out/
+
+# ===================== #
+# OS & Editor files     #
+# ===================== #
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# ===================== #
+# Coverage/Test         #
+# ===================== #
+**/coverage/
+
+# ===================== #
+# Optional SQLite (if used) #
+# ===================== #
+*.sqlite
+*.sqlite-journal
