@@ -6,10 +6,39 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  sessions     Session[]  // Relation: one user can have many sessions
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  roomId    String   @unique
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  whiteboard WhiteboardData? // One session = one whiteboard
+}
+
+model WhiteboardData {
+  id         String   @id @default(uuid())
+  sessionId  String   @unique
+  data       Json     // Whiteboard state stored as JSON
+  lastUpdated DateTime @updatedAt
+
+  session    Session  @relation(fields: [sessionId], references: [id])
 }
