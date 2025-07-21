@@ -4,6 +4,7 @@
 backend/node_modules/
 frontend/node_modules/
 bonus/node_modules/
+/node_modules/
 
 # ===================== #
 # Environment files     #
