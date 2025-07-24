@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret'; // keep it in .env
 
-exports.register = async (req, res) => {
+exports.signup = async (req, res) => {
   const { name, email, password } = req.body;
   try {
     const existingUser = await prisma.user.findUnique({ where: { email } });

@@ -1,90 +1,66 @@
 const express = require('express');
 const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const {
+  createSession,
+  getSessionById,
+  getSessionsByUser,
+  updateSessionTitle,
+  deleteSession,
+} = require('../controllers/sessionController');
 
-// Create a new whiteboard session
-router.post('/create', async (req, res) => {
-  const { userId, title } = req.body;
+// Create a new session
+router.post('/create', createSession);
+
+// Get a specific session by ID (including ordered pages)
+router.get('/:id', getSessionById);
+
+// Get all sessions for a user
+router.get('/user/:userId', getSessionsByUser);
+
+// Update session title
+router.put('/:id', updateSessionTitle);
+
+// Delete session
+router.delete('/:id', deleteSession);
+
+module.exports = router;
+// Save whiteboard content (pages)
+router.post('/save', async (req, res) => {
+  const { sessionId, pages } = req.body;
 
   try {
-    const session = await prisma.session.create({
-      data: {
-        userId,
-        title,
-      },
+    // Delete existing pages before saving new ones (optional: could update instead)
+    await prisma.page.deleteMany({ where: { sessionId } });
+
+    // Create new pages in bulk
+    const createdPages = await prisma.page.createMany({
+      data: pages.map((page, index) => ({
+        sessionId,
+        content: page.content,
+        order: index,
+      })),
     });
 
-    res.status(201).json(session);
+    res.status(200).json({ message: 'Session saved', pages: createdPages });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Failed to save session' });
   }
 });
 
-// Get a session with its pages in order
-router.get('/:id', async (req, res) => {
+// Load whiteboard content
+router.get('/load/:id', async (req, res) => {
   const sessionId = req.params.id;
 
   try {
-    const session = await prisma.session.findUnique({
-      where: { id: sessionId },
-      include: {
-        pages: {
-          orderBy: {
-            createdAt: 'asc',
-          },
-        },
-      },
+    const pages = await prisma.page.findMany({
+      where: { sessionId },
+      orderBy: { order: 'asc' },
     });
 
-    if (!session) {
-      return res.status(404).json({ message: 'Session not found' });
-    }
-
-    res.json(session);
+    res.status(200).json(pages);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Failed to load session' });
   }
 });
-
-// Get all sessions for a user
-router.get('/user/:userId', async (req, res) => {
-  try {
-    const sessions = await prisma.session.findMany({
-      where: { userId: req.params.userId },
-      orderBy: { createdAt: 'desc' },
-    });
-    res.json(sessions);
-  } catch (err) {
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
-// Edit a session's title
-router.put('/:id', async (req, res) => {
-  const { title } = req.body;
-  try {
-    const updated = await prisma.session.update({
-      where: { id: req.params.id },
-      data: { title },
-    });
-    res.json(updated);
-  } catch (err) {
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
-// Delete a session and its pages
-router.delete('/:id', async (req, res) => {
-  try {
-    await prisma.page.deleteMany({ where: { sessionId: req.params.id } });
-    await prisma.session.delete({ where: { id: req.params.id } });
-    res.json({ message: 'Session deleted' });
-  } catch (err) {
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
-module.exports = router;

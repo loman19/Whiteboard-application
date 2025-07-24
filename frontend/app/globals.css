@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global smooth font rendering */
+html, body {
+  @apply antialiased;
+  font-family: 'Inter', sans-serif;
+  scroll-behavior: smooth;
+  background: linear-gradient(to right, #fdfbfb, #ebedee); /* soft gradient */
+  color: #111827;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 100, 100, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/* Button hover animations globally */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Links (optional global style) */
+a {
+  @apply text-blue-600 hover:underline;
+}
